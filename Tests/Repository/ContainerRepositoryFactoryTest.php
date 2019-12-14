@@ -4,7 +4,7 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -12,13 +12,14 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use stdClass;
+use UnexpectedValueException;
 
 class ContainerRepositoryFactoryTest extends TestCase
 {
     public function testGetRepositoryReturnsService()
     {
         $em        = $this->createEntityManager(['Foo\CoolEntity' => 'my_repo']);
-        $repo      = new StubRepository($em, new ClassMetadata(''));
+        $repo      = new StubRepository();
         $container = $this->createContainer(['my_repo' => $repo]);
 
         $factory = new ContainerRepositoryFactory($container);
@@ -153,10 +154,70 @@ class ContainerRepositoryFactoryTest extends TestCase
     }
 }
 
-class StubRepository extends EntityRepository
+/**
+ * Repository implementing non-deprecated interface, as current interface implemented in ORM\EntityRepository
+ * uses deprecated one and Composer autoload triggers deprecations that can't be silenced by @group legacy
+ */
+class NonDeprecatedRepository implements ObjectRepository
+{
+    public function find($id)
+    {
+    }
+
+    /**
+     * Finds all objects in the repository.
+     *
+     * @return object[] The objects.
+     */
+    public function findAll()
+    {
+    }
+
+    /**
+     * Finds objects by a set of criteria.
+     *
+     * Optionally sorting and limiting details can be passed. An implementation may throw
+     * an UnexpectedValueException if certain values of the sorting or limiting details are
+     * not supported.
+     *
+     * @param mixed[] $criteria
+     * @param string[]|null $orderBy
+     * @param int|null $limit
+     * @param int|null $offset
+     *
+     * @return object[] The objects.
+     *
+     * @throws UnexpectedValueException
+     */
+    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null)
+    {
+    }
+
+    /**
+     * Finds a single object by a set of criteria.
+     *
+     * @param mixed[] $criteria The criteria.
+     *
+     * @return object|null The object.
+     */
+    public function findOneBy(array $criteria)
+    {
+    }
+
+    /**
+     * Returns the class name of the object managed by the repository.
+     *
+     * @return string
+     */
+    public function getClassName()
+    {
+    }
+}
+
+class StubRepository extends NonDeprecatedRepository
 {
 }
 
-class StubServiceRepository extends EntityRepository implements ServiceEntityRepositoryInterface
+class StubServiceRepository extends NonDeprecatedRepository implements ServiceEntityRepositoryInterface
 {
 }

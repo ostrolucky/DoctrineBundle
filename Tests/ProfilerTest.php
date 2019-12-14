@@ -4,7 +4,7 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Logging\DebugStack;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Bridge\Twig\Extension\CodeExtension;
